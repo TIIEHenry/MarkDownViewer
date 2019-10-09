@@ -1,6 +1,6 @@
 # MarkDownViewer
 
-![](md/screenshot.png)
+![](https://raw.githubusercontent.com/TIIEHenry/MarkDownViewer/master/md/screenshot.png)
 ## 使用方法:
 
 Add it in your root build.gradle at the end of repositories:
