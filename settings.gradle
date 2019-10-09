@@ -1,25 +1,4 @@
-//rootProject.name='MarkDownViewer'
-def moduleMap = [
-        "MarkDownViewer": ["app",
-                           "MarkDownViewer",
-        ]
-]
+rootProject.name='MarkDownViewer'
 
-
-def importFromDir(HashMap map, String path) {
-    map.each { entry ->
-        if (entry.value instanceof String) {
-            include entry.key
-            project(':' + entry.key).projectDir = new File(path, entry.key + '\\' + entry.value)
-        } else {
-            entry.value.each { lib ->
-                def name = entry.key + "." + lib
-                include name
-                project(':' + name).projectDir = new File(path, entry.key + '\\' + lib)
-            }
-        }
-    }
-}
-
-
-importFromDir(moduleMap, 'D:\\Android\\Projects\\')
+include ":app",
+        ":MarkDownViewer"

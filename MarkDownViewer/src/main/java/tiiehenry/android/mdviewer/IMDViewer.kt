@@ -4,7 +4,12 @@ import android.os.Build
 import android.util.Base64
 import android.util.Log
 import android.webkit.WebView
+import android.widget.Toast
+import org.jetbrains.anko.doAsync
 import java.io.*
+import java.lang.Exception
+import java.net.URL
+import java.net.URLDecoder
 import java.util.regex.Pattern
 
 interface IMDViewer {
@@ -13,8 +18,13 @@ interface IMDViewer {
 
     fun getWebView(): WebView
 
-    fun init(url: String = "file:///android_asset/html/md_preview.html"): IMDViewer {
+    fun init(url: String): IMDViewer {
         getWebView().loadUrl(url)
+        return this
+    }
+
+    fun init(): IMDViewer {
+        getWebView().loadUrl("file:///android_asset/html/md_preview_fitscale.html")
         return this
     }
 
@@ -26,9 +36,16 @@ interface IMDViewer {
         }
     }
 
-    fun loadAssets(name:String){
-        getWebView().context.assets.open(name).use {
-            loadMDStream(it)
+    fun loadAssets(name: String) {
+        try {
+            getWebView().context.assets.open(name).use {
+                loadMDStream(it)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            getWebView().post {
+                Toast.makeText(getWebView().context, "加载失败：$name\n${e.message}", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
@@ -41,12 +58,72 @@ interface IMDViewer {
     }
 
     fun loadMDFile(filePath: String) {
-        loadMDText(File(filePath).readText())
+        try {
+            loadMDText(File(filePath).readText())
+        } catch (e: Exception) {
+            e.printStackTrace()
+            getWebView().post {
+                Toast.makeText(getWebView().context, "加载失败：$filePath\n${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     fun loadMDText(mdText: String) {
         previewText = text2Mark(mdText)
         onPageFinished()
+    }
+
+    fun loadMDUrl(url: String): Boolean {
+        return if (url.endsWith(".md")) when {
+            url.startsWith("http") || url.startsWith("https") -> {
+                doAsync {
+                    val u = URL(url)
+                    try {
+                        val con = u.openConnection()
+                        val s = con.getInputStream().use {
+                            it.bufferedReader().readText()
+                        }
+                        getWebView().post {
+                            loadMDText(s)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        getWebView().post {
+                            Toast.makeText(getWebView().context, "加载失败：$url\n${e.message}", Toast.LENGTH_LONG).show()
+                        }
+                    }
+
+                }
+                true
+            }
+            url.startsWith("file:///android_asset/") -> {
+                val s = url.replace("file:///android_asset/", "")
+                try {
+                    decodePath(s)?.let {
+                        loadAssets(it)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                true
+            }
+            url.startsWith("file:/") -> {
+                val s = url.replace("file:///", "/").replace("file:/", "/")
+                try {
+                    decodePath(s)?.let {
+                        loadMDFile(it)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                true
+            }
+            else -> false
+        } else false
+    }
+
+    private fun decodePath(path: String): String? {
+        return URLDecoder.decode(path, "utf-8")
     }
 
     fun text2Mark(mdText: String): String {

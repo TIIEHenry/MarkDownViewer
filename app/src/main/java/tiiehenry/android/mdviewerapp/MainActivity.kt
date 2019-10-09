@@ -9,7 +9,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        md_viewer.init("file:///android_asset/html/md_preview_fitscale.html").apply {
+        md_viewer.init().apply {
             loadMDFile("/storage/emulated/0/我的笔记/update.md")
 //            loadMDText("# AAS\n## 奥斯丁")
         }

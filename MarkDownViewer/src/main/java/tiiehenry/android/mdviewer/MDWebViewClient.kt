@@ -10,6 +10,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import java.net.URISyntaxException
+import kotlin.collections.ArrayList
 
 open class MDWebViewClient : WebViewClient() {
     val urlCollection = ArrayList<String>()
@@ -28,12 +29,15 @@ open class MDWebViewClient : WebViewClient() {
     }
 
     override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-        //toast(url);
-        if (shouldOverrideUrlLoadingByApp(view.context, url)) {
-            return true
-        } else if (shouldOverrideUrlLoadingByUrl(url)) {
-            view.loadUrl(url)
+        when {
+            url.startsWith("file") -> view.loadUrl(url)
+            shouldOverrideUrlLoadingByApp(view.context, url) -> return true
+            shouldOverrideUrlLoadingByUrl(url) -> view.loadUrl(url)
         }
+
+            //返回值是true的时候控制去WebView打开，为false调用系统浏览器或第三方浏览器
+        //toast(request);
+        //toast(request);
 
         //返回值是true的时候控制去WebView打开，为false调用系统浏览器或第三方浏览器
         return true
@@ -42,13 +46,7 @@ open class MDWebViewClient : WebViewClient() {
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         val url = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             request.url.toString() else request.toString()
-        if (shouldOverrideUrlLoadingByApp(view.context, url)) {
-            return true
-        } else if (shouldOverrideUrlLoadingByUrl(url)) {
-            view.loadUrl(url)
-        }
-        //toast(request);
-        return true
+        return shouldOverrideUrlLoading(view, url)
     }
 
     override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
@@ -84,6 +82,7 @@ open class MDWebViewClient : WebViewClient() {
             //不处理http, https, ftp的请求
             return false
         }
+
         val intent: Intent
         try {
             intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME)

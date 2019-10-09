@@ -1,22 +1,22 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
 
+def versionPropsFile = file(/*System.getenv("GRADLE_USER_HOME") +*/ "D:/Android/KEY/key.properties")
+Properties keyProps = new Properties()
+if (versionPropsFile.canRead()) {
+    keyProps.load(new FileInputStream(versionPropsFile))
+} else {
+    throw new GradleException("Could not read key.properties!")
+}
 android {
     signingConfigs {
-        debug {
-            storeFile file('D:\\Android\\TIIEHenry.jks')
-            storePassword 'LHL20000301'
-            keyAlias = 'TIIEHenry'
-            keyPassword 'LHL20000301'
-        }
+
         release {
-            storeFile file('D:\\Android\\TIIEHenry.jks')
-            storePassword 'LHL20000301'
-            keyAlias = 'TIIEHenry'
-            keyPassword 'LHL20000301'
+            keyAlias keyProps['keyAlias'].toString()
+            storeFile file(keyProps['storeFile'].toString())
+            storePassword keyProps['storePassword'].toString()
+            keyPassword keyProps['keyPassword'].toString()
         }
     }
     compileSdkVersion 29
@@ -40,7 +40,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.1.0'
-//    implementation project(':markedview')
-    implementation project(':MarkDownViewer.MarkDownViewer')
+    implementation project(':MarkDownViewer')
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 }

@@ -8,20 +8,13 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
-
+        versionCode new Date().format('yyMMdd').toInteger()
+        versionName new Date().format('yy.MM.dd')
         consumerProguardFiles 'consumer-rules.pro'
     }
     sourceSets{
         main{
             assets.srcDirs = ['src/main/assets']
-        }
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -32,4 +25,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.1.0'
+
+    implementation "org.jetbrains.anko:anko-commons:$anko_version"
+    implementation "org.jetbrains.anko:anko-coroutines:$anko_version"
 }

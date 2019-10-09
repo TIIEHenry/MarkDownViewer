@@ -2,23 +2,21 @@ package tiiehenry.android.mdviewer
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.app.DownloadManager
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.os.Environment
 import android.os.Message
 import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.View
 import android.webkit.*
-import android.widget.EditText
 import java.util.HashMap
 
 open class MDWebView : WebView, IMDViewer, View.OnLongClickListener {
-    override var previewText: String=""
+    override var previewText: String = ""
 
-    private val webClient = object :MDWebViewClient(){
+    var onTitleReceived:(String)->Unit={
+
+    }
+    private val webClient = object : MDWebViewClient() {
         override fun onPageFinished(view: WebView, url: String) {
             super.onPageFinished(view, url)
             onPageFinished()
@@ -38,9 +36,9 @@ open class MDWebView : WebView, IMDViewer, View.OnLongClickListener {
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
-        context,
-        attrs,
-        defStyleAttr
+            context,
+            attrs,
+            defStyleAttr
     ) {
         initWebView()
     }
@@ -99,29 +97,29 @@ open class MDWebView : WebView, IMDViewer, View.OnLongClickListener {
             setAcceptThirdPartyCookies(this@MDWebView, true)
         }
 
-        setOnKeyListener(object:View.OnKeyListener{
+        setOnKeyListener(object : OnKeyListener {
             override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
-                    if (event?.action == KeyEvent.ACTION_DOWN) {
-                        //按返回键操作并且能回退网页
-                        if (keyCode == KeyEvent.KEYCODE_BACK ) {
-                            if (canGoBack()) {
-                                webClient.goBack()
-                                return true
-                            }
-                            return false
+                if (event?.action == KeyEvent.ACTION_DOWN) {
+                    //按返回键操作并且能回退网页
+                    if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        if (canGoBack()) {
+                            webClient.goBack()
+                            return true
                         }
+                        return false
                     }
-                    return false
+                }
+                return false
             }
         })
     }
 
 
-    private val chromeClient = object : WebChromeClient() {
+    val chromeClient = object : WebChromeClient() {
         //配置权限（同样在WebChromeClient中实现）
         override fun onGeolocationPermissionsShowPrompt(
-            origin: String,
-            callback: GeolocationPermissions.Callback
+                origin: String,
+                callback: GeolocationPermissions.Callback
         ) {
             callback.invoke(origin, true, false)
             super.onGeolocationPermissionsShowPrompt(origin, callback)
@@ -132,13 +130,14 @@ open class MDWebView : WebView, IMDViewer, View.OnLongClickListener {
 
         override fun onReceivedTitle(view: WebView, title: String) {
             //获取WebView的标题
+            onTitleReceived.invoke(title)
         }
 
         override fun onJsConfirm(
-            view: WebView,
-            url: String,
-            message: String,
-            result: JsResult
+                view: WebView,
+                url: String,
+                message: String,
+                result: JsResult
         ): Boolean {
             AlertDialog.Builder(context).apply {
                 //b.setTitle("删除");
@@ -151,22 +150,24 @@ open class MDWebView : WebView, IMDViewer, View.OnLongClickListener {
         }
 
         override fun onCreateWindow(
-            view: WebView,
-            isDialog: Boolean,
-            isUserGesture: Boolean,
-            resultMsg: Message
+                view: WebView,
+                isDialog: Boolean,
+                isUserGesture: Boolean,
+                resultMsg: Message
         ): Boolean {
             val newWebView = WebView(view.context)
             newWebView.webViewClient = object : WebViewClient() {
                 override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                    if (webClient.shouldOverrideUrlLoadingByApp(context, url)) {
-                        return true
-                    } else if (webClient.shouldOverrideUrlLoadingByUrl(url)) {
-                        // 在此处进行跳转URL的处理, 一般情况下_black需要重新打开一个页面, 这里我直接让当前的webview重新load了url
-                        val extraHeaders = HashMap<String, String>()
-                        extraHeaders["Referer"] = webClient.latestUrl
-                        //告诉网站上一个网站地址，防止盗链检测
-                        loadUrl(url, extraHeaders)
+                    when {
+                        url.startsWith("file") -> loadUrl(url)
+                        webClient.shouldOverrideUrlLoadingByApp(context, url) -> return true
+                        webClient.shouldOverrideUrlLoadingByUrl(url) -> {
+                            // 在此处进行跳转URL的处理, 一般情况下_black需要重新打开一个页面, 这里我直接让当前的webview重新load了url
+                            val extraHeaders = HashMap<String, String>()
+                            extraHeaders["Referer"] = webClient.latestUrl
+                            //告诉网站上一个网站地址，防止盗链检测
+                            loadUrl(url, extraHeaders)
+                        }
                     }
                     return true
                 }
@@ -180,6 +181,10 @@ open class MDWebView : WebView, IMDViewer, View.OnLongClickListener {
 
     }
 
+    override fun loadUrl(url: String?) {
+        if (url?.let { loadMDUrl(url) } != true)
+            super.loadUrl(url)
+    }
 
     override fun onLongClick(v: View): Boolean {
         val hitTestResult = hitTestResult
@@ -188,11 +193,11 @@ open class MDWebView : WebView, IMDViewer, View.OnLongClickListener {
             // 弹出保存图片的对话框
             hitTestResult.extra.let {
                 downloadListener?.onDownloadStart(
-                    it!!,
-                    settings.userAgentString,
-                    "",
-                    "image/png",
-                    0
+                        it!!,
+                        settings.userAgentString,
+                        "",
+                        "image/png",
+                        0
                 )
             }
         }
