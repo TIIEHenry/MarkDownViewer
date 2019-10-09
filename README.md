@@ -1,5 +1,22 @@
 # MarkDownViewer
 ## 使用方法:
+
+Add it in your root build.gradle at the end of repositories:
+```groovy
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://www.jitpack.io' }
+    }
+}
+```
+Add the dependency:
+```groovy
+dependencies {
+        implementation 'com.github.TIIEHenry:MarkDownViewer:{ReleaseTag}'
+}
+```
+Use in your code:
 ```
 val a=[WebVIew] extends IMDView
 or 
@@ -18,3 +35,5 @@ loadAssets("a.md")
 https://github.com/mittsuu/MarkedView-for-Android
 https://highlightjs.org/
 https://github.com/markedjs/marked
+
+
