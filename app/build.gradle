@@ -4,9 +4,9 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
     signingConfigs {
-
+/*
         release {
-            def versionPropsFile = file(/*System.getenv("GRADLE_USER_HOME") +*/ "D:/Android/KEY/key.properties")
+            def versionPropsFile = file(*//*System.getenv("GRADLE_USER_HOME") +*//* "D:/Android/KEY/key.properties")
             Properties keyProps = new Properties()
             if (versionPropsFile.canRead()) {
                 keyProps.load(new FileInputStream(versionPropsFile))
@@ -17,7 +17,7 @@ android {
             storeFile file(keyProps['storeFile'].toString())
             storePassword keyProps['storePassword'].toString()
             keyPassword keyProps['keyPassword'].toString()
-        }
+        }*/
     }
     compileSdkVersion 29
     defaultConfig {
