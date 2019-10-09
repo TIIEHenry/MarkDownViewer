@@ -10,7 +10,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         md_viewer.init().apply {
-            loadMDFile("/storage/emulated/0/我的笔记/update.md")
+            loadAssets("mxflutter.md")
+//            loadMDFile("/storage/emulated/0/我的笔记/update.md")
 //            loadMDText("# AAS\n## 奥斯丁")
         }
 
