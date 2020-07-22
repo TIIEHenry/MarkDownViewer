@@ -3,22 +3,6 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-/*    signingConfigs {
-*//*
-        release {
-            def versionPropsFile = file(*//*/*System.getenv("GRADLE_USER_HOME") +*//*/* "D:/Android/KEY/key.properties")
-            Properties keyProps = new Properties()
-            if (versionPropsFile.canRead()) {
-                keyProps.load(new FileInputStream(versionPropsFile))
-            } else {
-                throw new GradleException("Could not read key.properties!")
-            }
-            keyAlias keyProps['keyAlias'].toString()
-            storeFile file(keyProps['storeFile'].toString())
-            storePassword keyProps['storePassword'].toString()
-            keyPassword keyProps['keyPassword'].toString()
-        }*//*
-    }*/
     compileSdkVersion 29
     defaultConfig {
         applicationId "tiiehenry.android.markdownviewer"
@@ -37,9 +21,10 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(':md_webview')
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core-ktx:1.1.0'
-    implementation project(':MarkDownViewer')
+    implementation 'androidx.core:core-ktx:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 }

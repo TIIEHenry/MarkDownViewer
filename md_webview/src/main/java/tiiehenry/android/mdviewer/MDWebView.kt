@@ -13,7 +13,7 @@ import java.util.HashMap
 open class MDWebView : WebView, IMDViewer, View.OnLongClickListener {
     override var previewText: String = ""
 
-    var onTitleReceived:(String)->Unit={
+    var onTitleReceived: (String) -> Unit = {
 
     }
     private val webClient = object : MDWebViewClient() {
@@ -31,14 +31,18 @@ open class MDWebView : WebView, IMDViewer, View.OnLongClickListener {
 
     private var downloadListener: MDDownLoadListener? = null
 
-    constructor(context: Context) : this(context, null)
+    constructor(context: Context) : super(context) {
+        initWebView()
+    }
 
-    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        initWebView()
+    }
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
-            context,
-            attrs,
-            defStyleAttr
+        context,
+        attrs,
+        defStyleAttr
     ) {
         initWebView()
     }
@@ -50,7 +54,7 @@ open class MDWebView : WebView, IMDViewer, View.OnLongClickListener {
         overScrollMode = View.OVER_SCROLL_NEVER
         isScrollbarFadingEnabled = true
         scrollBarStyle = View.SCROLLBARS_INSIDE_OVERLAY
-        requestFocusFromTouch()
+//        requestFocusFromTouch()
         webViewClient = webClient
         webChromeClient = chromeClient
         setDownloadListener(downloadListener)
@@ -118,8 +122,8 @@ open class MDWebView : WebView, IMDViewer, View.OnLongClickListener {
     val chromeClient = object : WebChromeClient() {
         //配置权限（同样在WebChromeClient中实现）
         override fun onGeolocationPermissionsShowPrompt(
-                origin: String,
-                callback: GeolocationPermissions.Callback
+            origin: String,
+            callback: GeolocationPermissions.Callback
         ) {
             callback.invoke(origin, true, false)
             super.onGeolocationPermissionsShowPrompt(origin, callback)
@@ -134,10 +138,10 @@ open class MDWebView : WebView, IMDViewer, View.OnLongClickListener {
         }
 
         override fun onJsConfirm(
-                view: WebView,
-                url: String,
-                message: String,
-                result: JsResult
+            view: WebView,
+            url: String,
+            message: String,
+            result: JsResult
         ): Boolean {
             AlertDialog.Builder(context).apply {
                 //b.setTitle("删除");
@@ -150,10 +154,10 @@ open class MDWebView : WebView, IMDViewer, View.OnLongClickListener {
         }
 
         override fun onCreateWindow(
-                view: WebView,
-                isDialog: Boolean,
-                isUserGesture: Boolean,
-                resultMsg: Message
+            view: WebView,
+            isDialog: Boolean,
+            isUserGesture: Boolean,
+            resultMsg: Message
         ): Boolean {
             val newWebView = WebView(view.context)
             newWebView.webViewClient = object : WebViewClient() {
@@ -193,11 +197,11 @@ open class MDWebView : WebView, IMDViewer, View.OnLongClickListener {
             // 弹出保存图片的对话框
             hitTestResult.extra.let {
                 downloadListener?.onDownloadStart(
-                        it!!,
-                        settings.userAgentString,
-                        "",
-                        "image/png",
-                        0
+                    it!!,
+                    settings.userAgentString,
+                    "",
+                    "image/png",
+                    0
                 )
             }
         }

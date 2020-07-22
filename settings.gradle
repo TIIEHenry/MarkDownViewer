@@ -1,4 +1,4 @@
 rootProject.name='MarkDownViewer'
 
 include ":app",
-        ":MarkDownViewer"
+        ":md_webview"
