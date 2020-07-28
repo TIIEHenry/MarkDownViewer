@@ -24,7 +24,7 @@ interface IMDViewer {
     }
 
     fun init(): IMDViewer {
-        getWebView().loadUrl("file:///android_asset/html/md_preview_fitscale.html")
+        getWebView().loadUrl("file:///android_asset/md_webview/md_preview_fitscale.html")
         return this
     }
 
@@ -74,7 +74,7 @@ interface IMDViewer {
     }
 
     fun loadMDUrl(url: String): Boolean {
-        return if (url.endsWith(".md")) when {
+        return if (url.endsWith(".md")||url.endsWith(".MD")||url.endsWith(".Md")) when {
             url.startsWith("http") || url.startsWith("https") -> {
                 doAsync {
                     val u = URL(url)
