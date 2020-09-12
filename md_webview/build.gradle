@@ -28,3 +28,5 @@ dependencies {
     implementation "org.jetbrains.anko:anko-coroutines:$anko_version"
 }
 
+
+apply from: "../properties/maven-publish.gradle"
